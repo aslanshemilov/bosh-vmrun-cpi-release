@@ -25,10 +25,13 @@ type Client interface {
 
 //go:generate counterfeiter -o fakes/fake_config.go $GOPATH/src/bosh-vmrun-cpi/driver/driver.go Config
 type Config interface {
+	VmxPath(vmName string) string
+	EphemeralDiskPath(vmName string) string
+	EnvIsoPath(vmName string) string
+	PersistentDiskPath(diskId string) string
 	OvftoolPath() string
 	VmrunPath() string
 	VdiskmanagerPath() string
-	VmPath() string
 	VmStartMaxWait() time.Duration
 	VmSoftShutdownMaxWait() time.Duration
 }
