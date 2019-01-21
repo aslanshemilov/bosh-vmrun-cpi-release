@@ -94,10 +94,14 @@ var _ = Describe("driver integration", func() {
 			err = client.SetVMResources(vmId, 2, 1024)
 			Expect(err).ToNot(HaveOccurred())
 
+			err = client.SetVMDisplayName(vmId, "initial-name")
+			Expect(err).ToNot(HaveOccurred())
+
 			vmInfo, err = client.GetVMInfo(vmId)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(vmInfo.CPUs).To(Equal(2))
 			Expect(vmInfo.RAM).To(Equal(1024))
+			Expect(vmInfo.Name).To(Equal("initial-name"))
 
 			err = client.CreateEphemeralDisk(vmId, 2048)
 			Expect(err).ToNot(HaveOccurred())
@@ -130,6 +134,13 @@ var _ = Describe("driver integration", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			time.Sleep(1 * time.Second)
+
+			err = client.SetVMDisplayName(vmId, "final-name")
+			Expect(err).ToNot(HaveOccurred())
+
+			vmInfo, err = client.GetVMInfo(vmId)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(vmInfo.Name).To(Equal("final-name"))
 
 			err = client.DetachDisk(vmId, "disk-1")
 			Expect(err).ToNot(HaveOccurred())

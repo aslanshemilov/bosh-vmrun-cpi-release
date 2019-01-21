@@ -1,6 +1,8 @@
 package driver
 
-import "time"
+import (
+	"time"
+)
 
 //go:generate counterfeiter -o fakes/fake_client.go $GOPATH/src/bosh-vmrun-cpi/driver/driver.go Client
 type Client interface {
@@ -11,6 +13,7 @@ type Client interface {
 	StartVM(string) error
 	StopVM(string) error
 	HasVM(string) bool
+	SetVMDisplayName(vmName string, displayName string) error
 	SetVMNetworkAdapter(string, string, string) error
 	SetVMResources(string, int, int) error
 	CreateEphemeralDisk(string, int) error
@@ -48,6 +51,7 @@ type VmrunRunner interface {
 	Start(string) error
 	SoftStop(string) error
 	HardStop(string) error
+	Suspend(string) error
 	Delete(string) error
 	CopyFileFromHostToGuest(string, string, string, string, string) error
 	RunProgramInGuest(string, string, string, string, string) error
@@ -64,6 +68,7 @@ type VdiskmanagerRunner interface {
 	CreateDisk(string, int) error
 }
 
+//TODO: move to vm package
 type VMInfo struct {
 	Name string
 	CPUs int

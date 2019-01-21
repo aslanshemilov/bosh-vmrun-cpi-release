@@ -256,6 +256,40 @@ func (c ClientImpl) HasVM(vmName string) bool {
 	}
 }
 
+func (c ClientImpl) SetVMDisplayName(vmName, displayName string) error {
+	var err error
+	var initialVMState string
+
+	initialVMState, err = c.vmState(vmName)
+	if err != nil {
+		return err
+	}
+
+	if initialVMState == STATE_POWER_ON {
+		err = c.vmrunRunner.Suspend(c.config.VmxPath(vmName))
+		if err != nil {
+			c.logger.ErrorWithDetails("driver", "Suspend before setting display name", err)
+			return err
+		}
+	}
+
+	err = c.vmxBuilder.SetVMDisplayName(displayName, c.config.VmxPath(vmName))
+	if err != nil {
+		c.logger.ErrorWithDetails("driver", "SetVMDisplayName", err)
+		return err
+	}
+
+	if initialVMState == STATE_POWER_ON {
+		err = c.vmrunRunner.Start(c.config.VmxPath(vmName))
+		if err != nil {
+			c.logger.ErrorWithDetails("driver", "Resume after setting display name", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (c ClientImpl) CreateEphemeralDisk(vmName string, diskMB int) error {
 	var err error
 

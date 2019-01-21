@@ -93,6 +93,31 @@ var _ = Describe("cpi integration", func() {
 		vmCid = response["result"].(string)
 		Expect(vmCid).ToNot(Equal(""))
 
+		//set_vm_metadata
+		request = fmt.Sprintf(`{
+			"method":"set_vm_metadata",
+			"arguments":[
+				"%s",
+				{
+					"created_at":"2019-01-01T16:05:37-05:00",
+					"deployment":"bosh",
+					"director":"bosh-init",
+					"index":"0",
+					"instance_group":"bosh",
+					"job":"bosh",
+					"name":"bosh/ce7d2040-212e-4d5a-a62d-952a12c50741"
+				}
+			]
+		}`, vmCid)
+
+		session, stdin = GexecCommandWithStdin(cpiBin, "-configPath", CpiConfigPath)
+		stdin.Write([]byte(request))
+		stdin.Close()
+
+		Eventually(session.Out, "60s").Should(gbytes.Say(`"error":null`))
+		Expect(json.Unmarshal(session.Out.Contents(), &response)).To(Succeed())
+		Expect(response["result"]).To(BeNil())
+
 		//create_disk
 		diskMB := "2048"
 		request = fmt.Sprintf(`{

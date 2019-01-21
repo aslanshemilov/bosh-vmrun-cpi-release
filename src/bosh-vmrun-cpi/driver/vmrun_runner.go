@@ -70,6 +70,13 @@ func (c VmrunRunnerImpl) HardStop(vmxPath string) error {
 	return err
 }
 
+func (c VmrunRunnerImpl) Suspend(vmxPath string) error {
+	args := []string{"suspend", vmxPath, "hard"}
+
+	_, err := c.cliCommand(args, nil)
+	return err
+}
+
 func (c VmrunRunnerImpl) Delete(vmxPath string) error {
 	args := []string{"deleteVM", vmxPath}
 
