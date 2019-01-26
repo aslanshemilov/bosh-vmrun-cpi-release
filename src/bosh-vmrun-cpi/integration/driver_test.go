@@ -135,18 +135,18 @@ var _ = Describe("driver integration", func() {
 
 			time.Sleep(1 * time.Second)
 
-			err = client.SetVMDisplayName(vmId, "final-name")
+			err = client.SetVMDisplayName(vmId, "ignored-name-when-vm-running")
 			Expect(err).ToNot(HaveOccurred())
-
-			vmInfo, err = client.GetVMInfo(vmId)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(vmInfo.Name).To(Equal("final-name"))
 
 			err = client.DetachDisk(vmId, "disk-1")
 			Expect(err).ToNot(HaveOccurred())
 
 			err = client.StopVM(vmId)
 			Expect(err).ToNot(HaveOccurred())
+
+			vmInfo, err = client.GetVMInfo(vmId)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(vmInfo.Name).To(Equal("initial-name"))
 
 			err = client.DestroyVM(vmId)
 			Expect(err).ToNot(HaveOccurred())

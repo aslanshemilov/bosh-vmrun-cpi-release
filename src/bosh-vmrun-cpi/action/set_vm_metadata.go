@@ -27,12 +27,26 @@ func (m SetVMMetadataMethod) SetVMMetadata(vmCid apiv1.VMCID, apiVMMeta apiv1.VM
 		return err
 	}
 
-	if vmMeta.Name != "" {
-		m.logger.Debug("Setting VM display name", "name:", vmMeta.Name)
-		err = m.client.SetVMDisplayName(vmId, vmMeta.Name)
+	vmDisplayName := vmMeta.DisplayName()
+
+	if vmDisplayName != "" {
+		m.logger.Debug("SetVMMetadata", "Setting VM display name: ", vmDisplayName)
+		err = m.client.StopVM(vmId)
 		if err != nil {
 			return err
 		}
+
+		err = m.client.SetVMDisplayName(vmId, vmDisplayName)
+		if err != nil {
+			return err
+		}
+
+		err = m.client.StartVM(vmId)
+		if err != nil {
+			return err
+		}
+	} else {
+		m.logger.DebugWithDetails("SetVMMetadata", "Metadata does not contain enough data for display name", vmMeta)
 	}
 
 	return nil

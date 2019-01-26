@@ -104,8 +104,7 @@ var _ = Describe("cpi integration", func() {
 					"director":"bosh-init",
 					"index":"0",
 					"instance_group":"bosh",
-					"job":"bosh",
-					"name":"bosh/ce7d2040-212e-4d5a-a62d-952a12c50741"
+					"job":"bosh"
 				}
 			]
 		}`, vmCid)

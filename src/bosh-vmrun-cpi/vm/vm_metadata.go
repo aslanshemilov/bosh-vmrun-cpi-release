@@ -2,6 +2,7 @@ package vm
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/cppforlife/bosh-cpi-go/apiv1"
 )
@@ -29,4 +30,19 @@ func NewVMMetadata(apiVMMeta apiv1.VMMeta) (*VMMetadata, error) {
 	}
 
 	return vmMeta, nil
+}
+
+func (v *VMMetadata) DisplayName() string {
+	var vmDisplayName string
+
+	switch {
+	case v.Name != "":
+		vmDisplayName = v.Name
+	case v.Job != "" && v.Index != "":
+		vmDisplayName = fmt.Sprintf("%s/%s", v.Job, v.Index)
+	default:
+		vmDisplayName = ""
+	}
+
+	return vmDisplayName
 }
