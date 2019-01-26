@@ -48,15 +48,16 @@ fi
   echo "CPI: hypervisor: $installer_version $hypervisor_cpi_path" >> $err_log
 
   # Check ssh connectivity and cpi version
-  cpi_version=$(echo | ssh -q -i $private_key_file -p $port -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey $username@$host "$hypervisor_cpi_path -version" 2>/dev/null || true)
+  cpi_version=$(echo | ssh -q -i $private_key_file -p $port -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey -o BatchMode=yes $username@$host "$hypervisor_cpi_path -version" 2>/dev/null || true)
 
   echo "CPI: cpi: $cpi_version" >> $err_log
 
-  if [ -z "$cpi_version" ]; then
+  if [ "$cpi_version" = "" ]; then
     # CPI cpi args are passed the last args of SSH_ORIGINAL_COMMAND
     public_key=$(echo | ssh-keygen -y -f $private_key_file)
     auth_key_entry="restrict,command=\"$hypervisor_cpi_path \${SSH_ORIGINAL_COMMAND#* }\" $public_key $username@localhost"
     echo "CPI: ssh connection failed. Command not set correctly in authorized_key:\n---\n$auth_key_entry\n---" >> $err_log
+
     echo
     echo --------------------------
     echo "add to your ~/.ssh/authorized_keys:"
@@ -74,8 +75,7 @@ fi
     exit 1
   fi
 
-  echo exec ssh -q -i $private_key_file -p $port -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey $username@$host "$hypervisor_cpi_path -configBase64JSON $encoded_config" >> $err_log
-  exec ssh -q -i $private_key_file -p $port -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey $username@$host "$hypervisor_cpi_path -configBase64JSON $encoded_config" 2>> $err_log <&0
+  exec ssh -q -i $private_key_file -p $port -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey -o BatchMode=yes $username@$host "$hypervisor_cpi_path -configBase64JSON $encoded_config" 2>> $err_log <&0
 
 <% end.else do %>
 
